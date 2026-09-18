@@ -119,7 +119,9 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
 
   const scene = new Scene();
   const pmrem = new PMREMGenerator(renderer);
-  const envTexture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  const room = new RoomEnvironment();
+  const envTexture = pmrem.fromScene(room, 0.04).texture;
+  room.dispose();
   pmrem.dispose();
   scene.environment = envTexture;
 
@@ -212,6 +214,7 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
 
   // grounding: brand glow under the device, then a painted contact shadow on top of it
   const glowTex = track(new CanvasTexture(radialCanvas(256, `rgba(${GLOW_COLOR}, 0.35)`, `rgba(${GLOW_COLOR}, 0)`)));
+  glowTex.colorSpace = SRGBColorSpace;
   const glow = new Mesh(
     track(new PlaneGeometry(6, 4)),
     track(new MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false })),
@@ -222,6 +225,7 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
   laptop.add(glow);
 
   const shadowTex = track(new CanvasTexture(radialCanvas(256, "rgba(0,0,0,0.55)", "rgba(0,0,0,0)")));
+  shadowTex.colorSpace = SRGBColorSpace;
   const shadow = new Mesh(
     track(new PlaneGeometry(4.2, 3.0)),
     track(new MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })),
@@ -256,11 +260,13 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
   fit();
 
   let resizeQueued = false;
+  let resizeRaf = 0;
   const ro = new ResizeObserver(() => {
     if (resizeQueued) return;
     resizeQueued = true;
-    requestAnimationFrame(() => {
+    resizeRaf = requestAnimationFrame(() => {
       resizeQueued = false;
+      if (tornDown) return;
       fit();
       if (!running) renderer.render(scene, camera);
     });
@@ -431,6 +437,7 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
     aborter.abort();
     io.disconnect();
     ro.disconnect();
+    cancelAnimationFrame(resizeRaf);
     window.removeEventListener("scroll", onScroll);
     document.removeEventListener("visibilitychange", onVisibility);
     hero.removeEventListener("pointermove", onPointerMove);
