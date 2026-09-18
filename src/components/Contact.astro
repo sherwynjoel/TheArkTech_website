@@ -1,6 +1,13 @@
 ---
 import WarpShaderBackground from "@/components/ui/wrap-shader.tsx";
 import { EMAIL } from "../data/site";
+
+interface Props {
+  /** Small label above the heading; the contact page overrides it. */
+  eyebrow?: string;
+  heading?: string;
+}
+const { eyebrow = "Contact", heading = "Let's build it together" } = Astro.props;
 ---
 <section id="contact" class="relative section-y-lg overflow-hidden">
   <div class="absolute inset-0 -z-10" style="background: linear-gradient(135deg, var(--brand-deep), #04060d 70%);">
@@ -10,39 +17,40 @@ import { EMAIL } from "../data/site";
 
   <div class="container-x">
     <div class="max-w-xl mx-auto text-center mb-10">
-      <p class="eyebrow mb-3">Contact</p>
-      <h2 class="font-display text-[clamp(2rem,4vw,3.25rem)]">Let's build it together</h2>
+      <p class="eyebrow mb-3">{eyebrow}</p>
+      <h2 class="font-display text-[clamp(2rem,4vw,3.25rem)]">{heading}</h2>
       <p class="mt-3 text-ink-muted">Fill in your details and we'll open WhatsApp with a pre-typed message — reply whenever you're ready.</p>
     </div>
 
     <form id="contact-form" class="contact-card max-w-xl mx-auto rounded-3xl p-4 sm:p-8" novalidate>
+      <p class="cf-note">All fields are required.</p>
       <div class="cf-field">
-        <label for="cf-name" class="sr-only">Your name</label>
-        <input id="cf-name" name="name" type="text" placeholder="Your name" required minlength="2" autocomplete="name"
+        <label for="cf-name" class="cf-label">Name</label>
+        <input id="cf-name" name="name" type="text" required minlength="2" autocomplete="name"
           aria-describedby="cf-name-err"
           class="cf-input w-full rounded-xl bg-white/5 border border-white/15 px-4 py-3.5 text-ink placeholder-ink-faint focus:border-brand focus:ring-2 focus:ring-[var(--ring)] outline-none transition" />
         <p id="cf-name-err" class="cf-field-err" aria-live="polite"></p>
       </div>
 
       <div class="cf-field">
-        <label for="cf-email" class="sr-only">Your email</label>
-        <input id="cf-email" name="email" type="email" placeholder="Your email" required autocomplete="email"
+        <label for="cf-email" class="cf-label">Email</label>
+        <input id="cf-email" name="email" type="email" placeholder="you@example.com" required autocomplete="email"
           aria-describedby="cf-email-err"
           class="cf-input w-full rounded-xl bg-white/5 border border-white/15 px-4 py-3.5 text-ink placeholder-ink-faint focus:border-brand focus:ring-2 focus:ring-[var(--ring)] outline-none transition" />
         <p id="cf-email-err" class="cf-field-err" aria-live="polite"></p>
       </div>
 
       <div class="cf-field">
-        <label for="cf-phone" class="sr-only">Your phone</label>
-        <input id="cf-phone" name="phone" type="tel" placeholder="Your phone" required autocomplete="tel"
+        <label for="cf-phone" class="cf-label">Phone</label>
+        <input id="cf-phone" name="phone" type="tel" placeholder="+91 98765 43210" required autocomplete="tel"
           pattern="[0-9+()\s-]{7,}" aria-describedby="cf-phone-err"
           class="cf-input w-full rounded-xl bg-white/5 border border-white/15 px-4 py-3.5 text-ink placeholder-ink-faint focus:border-brand focus:ring-2 focus:ring-[var(--ring)] outline-none transition" />
         <p id="cf-phone-err" class="cf-field-err" aria-live="polite"></p>
       </div>
 
       <div class="cf-field">
-        <label for="cf-requirement" class="sr-only">Your query</label>
-        <textarea id="cf-requirement" name="requirement" rows="5" minlength="5" placeholder="Your requirement (min 5 characters)" required
+        <label for="cf-requirement" class="cf-label">What do you need?</label>
+        <textarea id="cf-requirement" name="requirement" rows="5" minlength="5" placeholder="Tell us about the project (at least 5 characters)" required
           aria-describedby="cf-requirement-err"
           class="cf-input w-full rounded-xl bg-white/5 border border-white/15 px-4 py-3.5 text-ink placeholder-ink-faint focus:border-brand focus:ring-2 focus:ring-[var(--ring)] outline-none transition"></textarea>
         <p id="cf-requirement-err" class="cf-field-err" aria-live="polite"></p>
@@ -59,12 +67,14 @@ import { EMAIL } from "../data/site";
     <!-- Shown after submit: the page must never look like nothing happened. -->
     <div id="cf-success" class="contact-card max-w-xl mx-auto rounded-3xl p-6 sm:p-8 text-center" hidden>
       <div class="cf-tick" aria-hidden="true">✓</div>
-      <h3 class="font-display text-2xl mt-3">We've opened WhatsApp</h3>
-      <p class="mt-2 text-ink-muted">
-        Press send in WhatsApp to reach us — your details are already typed in.
+      <h3 id="cf-success-title" class="font-display text-2xl mt-3">We've opened WhatsApp</h3>
+      <p id="cf-success-body" class="mt-2 text-ink-muted">
+        Press send in WhatsApp to reach us. Your details are already typed in.
         We usually reply within a few hours on working days.
       </p>
-      <p class="mt-5 text-sm text-ink-faint">Didn't open, or don't use WhatsApp?</p>
+      <!-- Only shown when the browser blocked the new tab: a real link, which no popup blocker stops. -->
+      <a id="cf-open" class="btn-primary mt-5" href="#" target="_blank" rel="noopener noreferrer" hidden>Open WhatsApp</a>
+      <p class="mt-5 text-sm text-ink-faint">Nothing opened, or don't use WhatsApp?</p>
       <div class="cf-fallbacks">
         <button type="button" id="cf-copy" class="btn-glass">Copy my message</button>
         <a id="cf-mail" class="btn-glass" href={`mailto:${EMAIL}`}>Email it instead</a>
@@ -82,7 +92,15 @@ import { EMAIL } from "../data/site";
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
   }
   .cf-field { margin-bottom: 0.35rem; }
-  .cf-field + .cf-field { margin-top: 0.75rem; }
+  .cf-field + .cf-field { margin-top: 1rem; }
+  .cf-note { margin: 0 0 1rem; font-size: 0.8rem; color: var(--ink-faint); }
+  .cf-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
 
   .cf-input[aria-invalid="true"] {
     border-color: #f87171;
@@ -126,7 +144,7 @@ import { EMAIL } from "../data/site";
     margin: 0.75rem 0 0;
   }
   .cf-reset {
-    margin-top: 0.5rem;
+    margin-top: 0.25rem; padding: 0.75rem 1rem; min-height: 44px;
     background: none;
     border: none;
     color: var(--ink-faint);
@@ -147,13 +165,16 @@ import { EMAIL } from "../data/site";
   const copyStatus = document.getElementById("cf-copy-status");
   const resetBtn = document.getElementById("cf-reset");
   const mailLink = document.getElementById("cf-mail") as HTMLAnchorElement | null;
+  const openLink = document.getElementById("cf-open") as HTMLAnchorElement | null;
+  const successTitle = document.getElementById("cf-success-title");
+  const successBody = document.getElementById("cf-success-body");
 
   const FIELDS = ["name", "email", "phone", "requirement"] as const;
 
   const MESSAGES: Record<string, { missing: string; invalid: string }> = {
     name: { missing: "Please tell us your name.", invalid: "Please enter at least 2 characters." },
     email: { missing: "Please enter your email.", invalid: "That doesn't look like a valid email address." },
-    phone: { missing: "Please enter your phone number.", invalid: "Please enter a valid phone number." },
+    phone: { missing: "Please enter your phone number.", invalid: "Please enter a valid phone number, e.g. +91 98765 43210." },
     requirement: { missing: "Please describe what you need.", invalid: "Please give us at least 5 characters." },
   };
 
@@ -220,7 +241,16 @@ import { EMAIL } from "../data/site";
     }
 
     lastMessage = buildMessage();
-    window.open(waLink(lastMessage), "_blank", "noopener,noreferrer");
+    const waUrl = waLink(lastMessage);
+
+    // Open WhatsApp in a new tab and find out whether it actually opened. The
+    // feature string deliberately omits `noopener`: with it, browsers return null
+    // even on success, so a blocked popup would be indistinguishable from an
+    // opened one. The opener link is cut by hand instead.
+    let popup: Window | null = null;
+    try { popup = window.open(waUrl, "_blank"); } catch { popup = null; }
+    if (popup) { try { popup.opener = null; } catch { /* already severed */ } }
+    const opened = popup !== null;
 
     if (mailLink) {
       mailLink.href =
@@ -228,13 +258,23 @@ import { EMAIL } from "../data/site";
         `&body=${encodeURIComponent(lastMessage)}`;
     }
 
-    // Swap the form for a confirmation so the page never looks inert —
-    // this also covers the case where the popup was blocked.
+    // Tell the truth about what happened. If the browser blocked the tab, the
+    // hand-off stays one click away as a plain link.
+    if (openLink) { openLink.href = waUrl; openLink.hidden = opened; }
+    if (successTitle) successTitle.textContent = opened ? "We've opened WhatsApp" : "Your message is ready";
+    if (successBody) {
+      successBody.textContent = opened
+        ? "Press send in WhatsApp to reach us. Your details are already typed in. We usually reply within a few hours on working days."
+        : "Your browser blocked the new tab. Open WhatsApp with the button below; your details are already typed in.";
+    }
+
+    // Swap the form for the confirmation so the page never looks inert.
     form.hidden = true;
     if (successPanel) {
       successPanel.hidden = false;
       successPanel.setAttribute("tabindex", "-1");
-      successPanel.focus();
+      // When blocked, land keyboard and screen-reader users on the one action that matters.
+      (opened || !openLink ? successPanel : openLink).focus();
     }
   });
 
@@ -257,6 +297,7 @@ import { EMAIL } from "../data/site";
       if (err) err.textContent = "";
     });
     if (successPanel) successPanel.hidden = true;
+    if (openLink) openLink.hidden = true;
     if (copyStatus) copyStatus.textContent = "";
     form.hidden = false;
     fieldEl("name")?.focus();

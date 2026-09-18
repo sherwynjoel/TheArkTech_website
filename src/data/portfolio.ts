@@ -53,10 +53,7 @@ export const portfolioProjects: PortfolioProject[] = [
       "A luxurious e-commerce platform for a premium jewelry brand, showcasing handcrafted gold and diamond collections with an elegant, immersive shopping experience.",
     image: "/portfolio/harsjewellery.webp",
     url: "https://harsjewellery.in",
-    metrics: [
-      { value: "Premium", label: "storefront UI" },
-      { value: "100%", label: "authenticity" },
-    ],
+    metrics: [],
     tags: ["E-Commerce", "Jewelry", "Luxury", "Online Store"],
     approach: [
       "Collection-based product catalogue with filtering",
@@ -75,10 +72,7 @@ export const portfolioProjects: PortfolioProject[] = [
       "India's premium destination for electronic components, sensors, IoT modules, and robotics kits. A complete e-commerce experience.",
     image: "/portfolio/zetraelectronics.webp",
     url: "https://zetraelectronics.com",
-    metrics: [
-      { value: "5000+", label: "products listed" },
-      { value: "24/7", label: "sales automation" },
-    ],
+    metrics: [{ value: "5000+", label: "products listed" }],
     tags: ["E-Commerce", "Electronics", "IoT", "Robotics"],
     approach: [
       "Component catalogue with category filtering",
@@ -147,10 +141,7 @@ export const portfolioProjects: PortfolioProject[] = [
       "A live business website for Axis Upgraders with clear service positioning, mobile-friendly presentation, and direct enquiry flow.",
     image: "/portfolio/axisupgraders.webp",
     url: "https://axisupgraders.com/",
-    metrics: [
-      { value: "Live", label: "website project" },
-      { value: "24/7", label: "online presence" },
-    ],
+    metrics: [],
     tags: ["Business Site", "Responsive", "Enquiry Flow", "Performance"],
     approach: [
       "Structured service and capability sections",
@@ -168,10 +159,7 @@ export const portfolioProjects: PortfolioProject[] = [
       "A business website for a frozen seafood import and export brand, focused on product credibility, company presence, and direct enquiry flow.",
     image: "/portfolio/devaseafood.webp",
     url: "https://devaseafood.com/",
-    metrics: [
-      { value: "B2B", label: "export presence" },
-      { value: "24/7", label: "online visibility" },
-    ],
+    metrics: [],
     tags: ["Food Export", "Business Site", "Responsive", "Lead Gen"],
   },
   {
@@ -210,10 +198,7 @@ export const portfolioProjects: PortfolioProject[] = [
       "A dental clinic website for patient education, treatment discovery, doctor profiles, international patient support, and direct appointment enquiries.",
     image: "/portfolio/gracedentalcarekovai.webp",
     url: "https://www.gracedentalcarekovai.com/",
-    metrics: [
-      { value: "10+", label: "years experience" },
-      { value: "1-stop", label: "dental facility" },
-    ],
+    metrics: [{ value: "10+", label: "years experience" }],
     tags: ["Dental", "Healthcare", "Treatments", "Appointments"],
   },
 ];

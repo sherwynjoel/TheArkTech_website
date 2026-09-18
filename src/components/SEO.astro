@@ -1,8 +1,9 @@
 ---
 import {
-	COMPANY_NAME, LEGAL_NAME, CIN, EMAIL, PHONE_E164, HOURS_SCHEMA,
+	COMPANY_NAME, LEGAL_NAME, CIN, EMAIL, PHONE_E164, PHONE_2_E164, HOURS_SCHEMA,
 	STREET_ADDRESS, POSTAL_CODE, CITY, REGION, COUNTRY, COUNTRY_CODE,
 } from '../data/site';
+import { FOUNDED_YEAR } from '../data/team';
 
 export interface Props {
 	title: string;
@@ -42,12 +43,13 @@ const structuredData = {
 			// Omitted rather than emitted blank until the registered name is set.
 			...(LEGAL_NAME ? { legalName: LEGAL_NAME } : {}),
 			...(CIN ? { identifier: { '@type': 'PropertyValue', name: 'CIN', value: CIN } } : {}),
+			...(FOUNDED_YEAR ? { foundingDate: FOUNDED_YEAR } : {}),
 			url: 'https://thearktech.in/',
 			logo: { '@type': 'ImageObject', url: 'https://thearktech.in/logo.png' },
 			image: 'https://thearktech.in/banner.png',
 			description:
 				'Software development company in Coimbatore building web and mobile applications, custom software, cloud infrastructure, and AI automation.',
-			telephone: PHONE_E164,
+			telephone: [PHONE_E164, PHONE_2_E164],
 			email: EMAIL,
 			address: {
 				'@type': 'PostalAddress',

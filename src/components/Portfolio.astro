@@ -44,7 +44,8 @@ import { portfolioProjects, projectSlug } from "../data/portfolio.ts";
             <h3 class="font-display">{project.title}</h3>
             <p>{project.summary}</p>
 
-            <dl class="portfolio-metrics">
+            {project.metrics.length > 0 && (
+              <dl class="portfolio-metrics">
               {project.metrics.map((metric) => (
                 <div>
                   <dt>{metric.value}</dt>
@@ -52,6 +53,7 @@ import { portfolioProjects, projectSlug } from "../data/portfolio.ts";
                 </div>
               ))}
             </dl>
+            )}
 
             <div class="portfolio-bottom">
               <div class="portfolio-tags" aria-label={`${project.title} technologies and features`}>
@@ -258,7 +260,7 @@ import { portfolioProjects, projectSlug } from "../data/portfolio.ts";
   }
 
   .portfolio-link {
-    width: fit-content;
+    width: fit-content; display: inline-flex; align-items: center; min-height: 44px; padding-block: 0.5rem; margin-block: -0.5rem;
     color: var(--ink);
     font-size: 0.82rem;
     font-weight: 700;

@@ -24,7 +24,12 @@ export const LEGAL_DISPLAY_NAME = LEGAL_NAME || COMPANY_NAME;
 export const WHATSAPP_NUMBER = "919489722142";
 export const PHONE_E164 = "+919489722142";
 export const PHONE_LABEL = "+91 94897 22142";
-export const EMAIL = "contact@thearktech.in";
+// Secondary line — shown alongside the primary on the contact page, in the
+// footer, and in the structured data. WhatsApp and the call button stay on
+// the primary number.
+export const PHONE_2_E164 = "+918122801912";
+export const PHONE_2_LABEL = "+91 81228 01912";
+export const EMAIL = "sherwynjoel@thearktech.in";
 
 // Postal address. Verification checks (AWS Activate, Google Business Profile,
 // payment gateways) look for a real, consistent address on the site.

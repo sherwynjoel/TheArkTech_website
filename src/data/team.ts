@@ -9,7 +9,7 @@
 // complete and honest right now, and gets stronger as you fill these in.
 
 /** e.g. "2023". Shown as "Founded 2023" and in the schema. */
-export const FOUNDED_YEAR = "";
+export const FOUNDED_YEAR = "2025";
 
 /** e.g. "6" or "5-10". Shown as "N people". */
 export const TEAM_SIZE = "";

@@ -1,5 +1,5 @@
 ---
-import { EMAIL as email, PHONE_E164 as phone, PHONE_LABEL as phoneLabel, ADDRESS_LINES, HOURS_LABEL, LEGAL_DISPLAY_NAME, CIN } from "../data/site";
+import { EMAIL as email, PHONE_E164 as phone, PHONE_LABEL as phoneLabel, PHONE_2_E164 as phone2, PHONE_2_LABEL as phone2Label, ADDRESS_LINES, HOURS_LABEL, LEGAL_DISPLAY_NAME, CIN } from "../data/site";
 
 const year = new Date().getFullYear();
 ---
@@ -66,6 +66,7 @@ const year = new Date().getFullYear();
       <address class="not-italic space-y-2 text-ink-muted">
         <div><a href={`mailto:${email}`} class="hover:text-ink">{email}</a></div>
         <div><a href={`tel:${phone}`} class="hover:text-ink">{phoneLabel}</a></div>
+        <div><a href={`tel:${phone2}`} class="hover:text-ink">{phone2Label}</a></div>
         {ADDRESS_LINES.map((line) => <div>{line}</div>)}
         <div class="text-ink-faint text-sm pt-1">{HOURS_LABEL}</div>
       </address>
