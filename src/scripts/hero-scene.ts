@@ -9,7 +9,6 @@
  */
 import {
   CanvasTexture,
-  Clock,
   Color,
   DirectionalLight,
   Group,
@@ -64,7 +63,7 @@ const RIM_COLOR = "#60a5fa"; // --brand-bright
 const GLOW_COLOR = "59, 130, 246"; // --brand, as rgb() components
 const TEXTURE_WIDTH = 1024;
 const CAMERA_FOV = 32;
-const CAMERA_DISTANCE = 6.2;
+const CAMERA_DISTANCE = 5.4;
 
 /* ---------- small canvas helpers ---------- */
 
@@ -259,6 +258,14 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
   }
   fit();
 
+  // Both flags are declared here, above the ResizeObserver, rather than beside
+  // the code that owns them further down: the observer fires its first callback
+  // while mount() is still awaiting the opening screenshot, and that callback
+  // reads both. Declared any later they would still be in the temporal dead
+  // zone when it runs.
+  let tornDown = false;
+  let running = false;
+
   let resizeQueued = false;
   let resizeRaf = 0;
   const ro = new ResizeObserver(() => {
@@ -340,7 +347,7 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
 
   /* ---------- motion state ---------- */
 
-  const clock = new Clock(false);
+  let lastFrameTime = 0;
   let cycler: CyclerState = createCycler();
   const target: Rotation = { yaw: 0, pitch: 0 };
   const current: Rotation = { yaw: 0, pitch: 0 };
@@ -372,15 +379,17 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
 
   /* ---------- frame loop with pause/resume ---------- */
 
-  let running = false;
+  // `running` is declared above, next to `tornDown`.
   let raf = 0;
   let heroVisible = true;
-  let elapsed = 0; // our own accumulator: Clock.start() zeroes elapsedTime on every resume
+  let elapsed = 0; // our own accumulator, so a pause does not jump the float
 
   function frame() {
     raf = 0;
     if (!running) return;
-    const dt = Math.min(clock.getDelta(), 0.05);
+    const now = performance.now();
+    const dt = Math.min((now - lastFrameTime) / 1000, 0.05);
+    lastFrameTime = now;
     elapsed += dt;
     const t = elapsed;
 
@@ -405,11 +414,9 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
     if (on === running) return;
     running = on;
     if (on) {
-      clock.start();
-      clock.getDelta(); // swallow the pause so the first dt after resume is small
+      lastFrameTime = performance.now();
       if (!raf) raf = requestAnimationFrame(frame);
     } else {
-      clock.stop();
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
     }
@@ -429,7 +436,6 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
 
   /* ---------- teardown and context loss ---------- */
 
-  let tornDown = false;
   function teardown() {
     if (tornDown) return;
     tornDown = true;
