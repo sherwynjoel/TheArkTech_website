@@ -1,6 +1,5 @@
 ---
-import { Image } from "astro:assets";
-import heroArt from "../assets/hero.png";
+import HeroScene from "./HeroScene.astro";
 
 // Rotated by CSS animation alone — this used to be a React island (plus the
 // whole React runtime) loaded client:load for a setInterval word swap.
@@ -84,18 +83,9 @@ const particles = [
       </div>
     </div>
 
-    <!-- ── RIGHT: product illustration ── -->
+    <!-- ── RIGHT: the laptop — poster for everyone, WebGL scene where allowed ── -->
     <div class="lg:col-span-5 relative hero-visual">
-      <div class="hero-figure">
-        <Image
-          src={heroArt}
-          alt="3D render of a laptop with glowing blue connections linking floating dashboard and app screens TheArkTech builds"
-          class="hero-art"
-          widths={[480, 760, 1100, 1536]}
-          sizes="(min-width: 1024px) 34rem, 90vw"
-          loading="eager"
-        />
-      </div>
+      <HeroScene />
     </div>
   </div>
 </section>
@@ -235,31 +225,13 @@ const particles = [
   /* ── right visual: product illustration ── */
   .hero-visual { position: relative; }
 
-  .hero-figure {
-    position: relative;
-    display: grid;
-    place-items: center;
-    padding: 1rem 0;
-  }
-  .hero-art {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 34rem;
-    height: auto;
-    filter: drop-shadow(0 28px 55px rgba(0,0,0,0.55));
-    animation: hero-art-float 8s ease-in-out infinite alternate;
-  }
-  @keyframes hero-art-float {
-    from { transform: translateY(-8px); }
-    to   { transform: translateY(10px); }
-  }
+  /* Two motion systems in one viewport compete; the scene wins while it is live. */
+  #home.is-live .hero-particle { display: none; }
 
   @media (prefers-reduced-motion: reduce) {
     .hero-blob, .hero-glow { animation: none; }
     .hero-particle { display: none; }
     .hero-live-dot { animation: none; }
-    .hero-art { animation: none; }
     /* Settle on the first word rather than cycling — without this the global
        reduced-motion rule would collapse the cycle and leave every word at
        its end state (invisible). */
