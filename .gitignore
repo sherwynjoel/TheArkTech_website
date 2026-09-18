@@ -27,3 +27,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# subagent-driven-development scratch (ledger, briefs, review packages)
+.superpowers/
