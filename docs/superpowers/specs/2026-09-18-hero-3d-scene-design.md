@@ -36,7 +36,7 @@ Units: 1 unit = 10 cm. All numbers below are targets; tune by eye within about 2
 - Source: `portfolioProjects` in `src/data/portfolio.ts`, in that order. `HeroScene.astro` serialises the `image` paths into a `data-screens` JSON attribute. The script never hardcodes a path.
 - Screen material: a small custom `ShaderMaterial` with two sampler uniforms and a `mix` float. Unlit, so screenshots render at true colour.
 - Timing: hold 3.5 s, crossfade 0.8 s, ease-out. Loop forever while the scene is running.
-- Texture pipeline: each image is fetched, decoded with `createImageBitmap` at `resizeWidth: 1024`, uploaded with `SRGBColorSpace`, `generateMipmaps: false`, linear filtering. Only the current and next textures are kept; the previous one is disposed after each crossfade completes. The next image is requested as soon as a crossfade finishes, so it is ready before it is needed.
+- Texture pipeline: each image is decoded through an `Image` element (`decode()`), drawn onto a canvas downscaled to 1024 px wide, and uploaded as a `CanvasTexture` with `SRGBColorSpace`, `generateMipmaps: false`, linear filtering. (Chosen over `createImageBitmap` because its orientation and resize options are inconsistent across Safari versions.) Only the current and next textures are kept; the previous one is disposed after each crossfade completes. The next image is requested as soon as a crossfade finishes, so it is ready before it is needed.
 - If a screenshot fails to load, skip it and continue with the next. If the first one fails, the scene still starts with a dark screen and tries the next.
 
 ## Interaction
@@ -68,7 +68,7 @@ Units: 1 unit = 10 cm. All numbers below are targets; tune by eye within about 2
 ## Files and interfaces
 
 - `src/components/HeroScene.astro` (new). Props: none. Reads `portfolioProjects` and the hero art import. Renders poster, canvas box, `data-screens`, and the small gate script.
-- `src/scripts/hero-scene.ts` (new). Exports `mount(container: HTMLElement, opts: { screens: string[]; hero: HTMLElement; finePointer: boolean }): () => void`. The return value tears everything down (cancels the frame loop, disconnects observers, disposes geometry, materials, textures and the renderer). Nothing else is exported.
+- `src/scripts/hero-scene.ts` (new). Exports `mount(container: HTMLElement, opts: { screens: string[]; hero: HTMLElement; finePointer: boolean; onContextLost?: () => void }): Promise<() => void>`. The promise resolves once the first frame has rendered with the first screenshot that decoded (or a dark screen if none did), so the gate reveals a finished picture. The resolved function tears everything down (cancels the frame loop, disconnects observers, disposes geometry, materials, textures and the renderer). `onContextLost` is called after the scene has torn itself down on GPU context loss. Nothing else is exported.
 - `src/components/Hero.astro` (edit). The right column renders `<HeroScene />` instead of the `<Image>`; the `heroArt` import and `.hero-art` styles move into `HeroScene.astro`. The `.hero-visual` wrapper and grid stay. One new rule: `#home.is-live .hero-particle { display: none; }`.
 - `package.json`: add `three`. Lockfile updated by npm.
 
