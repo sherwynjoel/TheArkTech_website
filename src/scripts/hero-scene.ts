@@ -265,11 +265,11 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
   }
   fit();
 
-  // These are declared here, above the ResizeObserver, rather than beside the
-  // code that owns them further down: the observer fires its first callback
-  // while mount() is still awaiting the opening screenshot, and that callback
-  // reads all four. Declared any later they would still be in the temporal
-  // dead zone when it runs.
+  // These are declared here, ahead of the ResizeObserver and the first
+  // `await` below, rather than beside the code that owns them further down:
+  // the resize callback reads `tornDown` and, through readScroll(), writes
+  // `scrollTarget`. All four are declared here so none of them is still in
+  // the temporal dead zone when that callback runs.
   let tornDown = false;
   let running = false;
   let scrollTarget = 0;
@@ -347,16 +347,6 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
     screenMat.uniforms.uMix.value = 0;
     requestNext();
   }
-
-  // Registered before the first await below so a context loss during the
-  // opening screenshot load is still caught. `teardown` is a hoisted function
-  // declaration, so calling it here, ahead of its own definition, is safe.
-  const onLost = (e: Event) => {
-    e.preventDefault();
-    teardown();
-    opts.onContextLost?.();
-  };
-  glCanvas.addEventListener("webglcontextlost", onLost);
 
   // First screenshot: try each in order until one decodes. The scene still
   // starts (dark screen) if none does.
@@ -477,6 +467,18 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
     scene.environment = null;
     renderer.dispose();
   }
+
+  // Registered here, after every observer and listener teardown() dereferences
+  // already exists, rather than before the opening screenshot's await: this
+  // closes a temporal-dead-zone race where a context loss during that await
+  // would call teardown() before `io`, `onScroll`, `onVisibility`,
+  // `onPointerMove` and `onPointerLeave` were declared.
+  const onLost = (e: Event) => {
+    e.preventDefault();
+    teardown();
+    opts.onContextLost?.();
+  };
+  glCanvas.addEventListener("webglcontextlost", onLost);
 
   // First frame now, so the gate can reveal a finished picture, then start the loop
   // and the preload of the second screenshot.
