@@ -26,7 +26,7 @@ export const TEAM_SIZE = "";
 export const STORY: string[] = [
   "TheArkTech exists because most businesses don't need a showpiece — they need software that works on a Tuesday morning when an order comes in. Our clients are jewellers, clinics, exporters, manufacturers, and training companies. What they have in common is that the thing we build for them has to hold up in daily use.",
   "So we build in the open. Every project starts with a written scope, so you know the cost and the timeline before anyone writes a line of code. You see something reviewable at the end of each cycle rather than waiting for a reveal. And when the work is done, the source code, the repositories, and the infrastructure accounts are yours — we don't hold credentials or lock anyone into a platform they can't leave.",
-  "The clearest way to judge us is to look at what we've already shipped. Every project in our portfolio is a live site you can open right now and use as a real customer would. We'd rather be checked than believed.",
+  "The clearest way to judge us is to look at what we've already shipped. Every project we've delivered is a live site in daily use, and we're happy to share the ones relevant to your industry. We'd rather be checked than believed.",
 ];
 
 export interface TeamMember {

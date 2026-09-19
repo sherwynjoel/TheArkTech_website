@@ -4,7 +4,6 @@
 // `spy` keeps the scroll-spy matching against the homepage section ids.
 const links = [
   { href: "/#services", spy: "#services", label: "Services" },
-  { href: "/work", spy: "#portfolio", label: "Work" },
   { href: "/about", spy: "#why", label: "About" },
   { href: "/contact", spy: "#contact", label: "Contact" },
 ];
@@ -88,7 +87,7 @@ const links = [
 
   // Scroll-spy: reflect the section in view on the nav links (desktop + mobile share hrefs).
   const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>(".nav-link"));
-  const watched = ["services", "industries", "portfolio", "contact"]
+  const watched = ["services", "industries", "contact"]
     .map((id) => document.getElementById(id))
     .filter((el): el is HTMLElement => !!el);
   if (navLinks.length && watched.length) {

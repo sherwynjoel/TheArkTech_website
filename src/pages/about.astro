@@ -5,15 +5,12 @@ import SiteFooter from "../components/SiteFooter.astro";
 import SEO from "../components/SEO.astro";
 import CallFab from "../components/CallFab.astro";
 import { services } from "../data/services.ts";
-import { portfolioProjects } from "../data/portfolio.ts";
 import { industries } from "../data/industries.ts";
 import { FOUNDED_YEAR, TEAM_SIZE, STORY, TEAM, PROCESS } from "../data/team.ts";
 import {
   COMPANY_NAME, LEGAL_DISPLAY_NAME, COMPANY_TYPE, CIN,
-  ADDRESS_LINES, LOCATION, EMAIL, waLink,
+  ADDRESS_LINES, LOCATION, EMAIL, PROJECTS_DELIVERED, waLink,
 } from "../data/site";
-
-const liveCount = portfolioProjects.filter((p) => p.url).length;
 
 const facts = [
   { k: "Company type", v: `${COMPANY_TYPE}, registered in India` },
@@ -21,7 +18,7 @@ const facts = [
   ...(TEAM_SIZE ? [{ k: "Team", v: `${TEAM_SIZE} people` }] : []),
   { k: "Based in", v: LOCATION },
   { k: "Services", v: `${services.length} engineering services` },
-  { k: "Client projects", v: `${portfolioProjects.length} delivered, ${liveCount} live today` },
+  { k: "Client projects", v: `${PROJECTS_DELIVERED} delivered across India` },
   { k: "Industries served", v: `${industries.length}` },
   ...(CIN ? [{ k: "CIN", v: CIN }] : []),
 ];
@@ -43,7 +40,7 @@ const schema = {
     <link rel="icon" type="image/png" href="/logo.png" />
     <SEO
       title={`About ${COMPANY_NAME} — Software Development Company in ${LOCATION}`}
-      description={`${COMPANY_NAME} is a ${COMPANY_TYPE.toLowerCase()} in ${LOCATION} building web and mobile applications, custom software, cloud infrastructure, and AI automation. ${portfolioProjects.length} client projects delivered.`}
+      description={`${COMPANY_NAME} is a ${COMPANY_TYPE.toLowerCase()} in ${LOCATION} building web and mobile applications, custom software, cloud infrastructure, and AI automation. ${PROJECTS_DELIVERED} client projects delivered.`}
       url="https://thearktech.in/about"
       image="https://thearktech.in/banner.png"
       siteName={COMPANY_NAME}
@@ -66,12 +63,10 @@ const schema = {
           <p class="ab-lede">
             {COMPANY_NAME} is a {COMPANY_TYPE.toLowerCase()} building web and mobile
             applications, custom software, cloud infrastructure, and AI automation.
-            We've delivered {portfolioProjects.length} client projects
-            — {liveCount} of them are live and you can visit every one.
+            We've delivered {PROJECTS_DELIVERED} client projects across India.
           </p>
           <div class="ab-actions">
-            <a href="/work" class="btn-primary">See our work</a>
-            <a href={enquiry} target="_blank" rel="noopener noreferrer" class="btn-glass">Talk to us</a>
+            <a href={enquiry} target="_blank" rel="noopener noreferrer" class="btn-primary">Talk to us</a>
           </div>
         </header>
 

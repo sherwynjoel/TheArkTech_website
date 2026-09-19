@@ -6,7 +6,6 @@ import SEO from "../../components/SEO.astro";
 import CallFab from "../../components/CallFab.astro";
 import Icon from "../../components/Icon.astro";
 import { services, serviceSlug, type Service } from "../../data/services.ts";
-import { portfolioProjects, projectSlug } from "../../data/portfolio.ts";
 import { COMPANY_NAME, CITY, waLink } from "../../data/site";
 
 export function getStaticPaths() {
@@ -19,7 +18,6 @@ export function getStaticPaths() {
 const { service } = Astro.props as { service: Service };
 const url = `https://thearktech.in/services/${serviceSlug(service)}`;
 
-const work = portfolioProjects.filter((p) => service.workTypes?.includes(p.type));
 const others = services.filter((s) => serviceSlug(s) !== serviceSlug(service));
 
 const enquiry = waLink(
@@ -115,30 +113,11 @@ const schema = {
           </div>
         </section>
 
-        {work.length > 0 && (
-          <section class="sv-block">
-            <h2>{work.length} project{work.length === 1 ? "" : "s"} delivered under this service</h2>
-            <div class="sv-work">
-              {work.map((p) => (
-                <a href={`/work/${projectSlug(p)}`} class="sv-work-card">
-                  <img src={p.image} alt={`${p.title} — ${p.type}`} width="1280" height="800" loading="lazy" decoding="async" />
-                  <div class="sv-work-body">
-                    <span class="sv-work-sector">{p.sector}</span>
-                    <span class="sv-work-title">{p.title}</span>
-                    <span class="sv-work-more">Case study →</span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
-
         <section class="sv-cta">
           <h2 class="font-display">Need {service.title.toLowerCase()}?</h2>
           <p>Tell us the requirement and we'll come back with scope, cost, and a timeline.</p>
           <div class="sv-actions">
             <a href={enquiry} target="_blank" rel="noopener noreferrer" class="btn-primary">Start a project</a>
-            <a href="/work" class="btn-glass">See our work</a>
           </div>
         </section>
 
@@ -203,18 +182,6 @@ const schema = {
     color: var(--brand-bright);
   }
 
-  .sv-work { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
-  .sv-work-card {
-    border-radius: 1rem; overflow: hidden;
-    background: var(--bg-elev); border: 1px solid var(--line);
-    transition: transform var(--dur-2) var(--ease-out-quart), border-color var(--dur-2) var(--ease-out-quart);
-  }
-  .sv-work-card:hover { transform: translateY(-3px); border-color: var(--line-brand); }
-  .sv-work-card img { width: 100%; height: 9rem; object-fit: cover; object-position: top; }
-  .sv-work-body { padding: 0.9rem 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.2rem; }
-  .sv-work-sector { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
-  .sv-work-title { font-family: "Clash Display", sans-serif; font-weight: 600; }
-  .sv-work-more { font-size: 0.8rem; color: var(--brand-bright); margin-top: 0.3rem; }
 
   .sv-others { display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
   .sv-other {
