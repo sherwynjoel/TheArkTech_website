@@ -51,7 +51,7 @@ Units: 1 unit = 10 cm. All numbers below are targets; tune by eye within about 2
 1. `HeroScene.astro` renders the existing `<Image>` poster exactly as today, plus a `<div class="hero-scene" hidden>` containing a `<canvas aria-hidden="true">`. Both share one fixed-aspect box so nothing shifts.
 2. A small component `<script>` in `HeroScene.astro` (bundled by Astro as a deferred module, a few hundred bytes, no three.js import) decides whether to try WebGL. It gives up immediately, leaving the poster, if any of these hold: `prefers-reduced-motion: reduce`; `navigator.connection.saveData === true`; the URL has `scene=off`; `document.createElement("canvas").getContext("webgl2")` is null.
 3. Otherwise, after `window.load` and then `requestIdleCallback` (fallback `setTimeout` 200 ms), it checks that the hero is still at least partly in view; if not, it gives up. If so it does `import("../scripts/hero-scene.ts")` and calls `mount(container, options)`.
-4. `mount` builds the scene, loads the first screenshot, renders one frame, then un-hides the canvas box and adds `is-live` to the hero. CSS crossfades the canvas in over 500 ms and the poster out over the same time; the poster then gets `hidden`.
+4. `mount` builds the scene, loads the first screenshot, renders one frame, then un-hides the canvas box and adds `is-live` to the hero. CSS crossfades the canvas in over 500 ms and the poster out over the same time; the poster stays in the DOM at opacity 0 so its alt text remains the accessible description of the hero visual.
 5. Any exception during steps 3 or 4 is caught, logged with `console.warn`, and leaves the poster untouched.
 6. While `is-live` is set, `.hero-particle` elements are `display: none`.
 

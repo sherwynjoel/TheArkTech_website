@@ -40,6 +40,7 @@ const screens = portfolioProjects.map((p) => p.image);
     width: 100%;
     max-width: 34rem;
     margin-inline: auto;
+    margin-block: 1rem;
     aspect-ratio: var(--hero-aspect);
   }
   .hero-art,
@@ -72,7 +73,7 @@ const screens = portfolioProjects.map((p) => p.image);
   }
   /* `is-live` is set on #home, which lives in Hero.astro, hence :global. */
   :global(#home.is-live) .hero-scene { opacity: 1; }
-  :global(#home.is-live) .hero-art { opacity: 0; animation: none; }
+  :global(#home.is-live) .hero-art { opacity: 0; }
 
   @media (prefers-reduced-motion: reduce) {
     .hero-art { animation: none; }
@@ -130,22 +131,18 @@ const screens = portfolioProjects.map((p) => p.image);
       const restorePoster = () => {
         hero.classList.remove("is-live");
         box.hidden = true;
-        poster.hidden = false;
       };
+      box.hidden = false;
       await mount(box, {
         screens,
         hero,
         finePointer: matchMedia("(pointer: fine)").matches,
         onContextLost: restorePoster,
       });
-      box.hidden = false;
       // next frame, so the opacity transition actually runs
       requestAnimationFrame(() => hero.classList.add("is-live"));
-      // once the crossfade is over the poster is dead weight for the compositor
-      setTimeout(() => {
-        if (hero.classList.contains("is-live")) poster.hidden = true;
-      }, 600);
     } catch (err) {
+      box.hidden = true;
       console.warn("hero-scene: leaving the poster in place", err);
     }
   }

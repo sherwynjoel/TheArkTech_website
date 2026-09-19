@@ -22,7 +22,7 @@ import {
   Scene,
   ShaderMaterial,
   SRGBColorSpace,
-  Texture,
+  type Texture,
   WebGLRenderer,
 } from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
@@ -83,6 +83,7 @@ function radialCanvas(size: number, inner: string, outer: string): HTMLCanvasEle
 async function loadScreenTexture(url: string, signal: AbortSignal): Promise<CanvasTexture> {
   const img = new Image();
   img.decoding = "async";
+  img.crossOrigin = "anonymous";
   img.src = url;
   await img.decode(); // throws on 404 or a broken file
   if (signal.aborted) throw new DOMException("aborted", "AbortError");
@@ -99,18 +100,24 @@ async function loadScreenTexture(url: string, signal: AbortSignal): Promise<Canv
   return tex;
 }
 
-/* ---------- the scene ---------- */
+/* ---------- the scene ----------
+ * The gate in HeroScene.astro discards the returned teardown on purpose: this
+ * site has no client-side router, so the page unload releases everything. If
+ * a client router (Astro ClientRouter / view transitions) is ever added, call
+ * the teardown on `astro:before-swap`.
+ */
 
 export async function mount(container: HTMLElement, opts: MountOptions): Promise<() => void> {
   const canvas = container.querySelector("canvas");
   if (!canvas) throw new Error("hero-scene: no canvas in container");
+  const glCanvas: HTMLCanvasElement = canvas;
   const { hero, screens } = opts;
 
   const renderer = new WebGLRenderer({
     canvas,
     alpha: true,
     antialias: true,
-    powerPreference: "high-performance",
+    powerPreference: "default",
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, opts.finePointer ? 2 : 1.5));
   renderer.setClearColor(0x000000, 0);
@@ -258,13 +265,15 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
   }
   fit();
 
-  // Both flags are declared here, above the ResizeObserver, rather than beside
-  // the code that owns them further down: the observer fires its first callback
+  // These are declared here, above the ResizeObserver, rather than beside the
+  // code that owns them further down: the observer fires its first callback
   // while mount() is still awaiting the opening screenshot, and that callback
-  // reads both. Declared any later they would still be in the temporal dead
-  // zone when it runs.
+  // reads all four. Declared any later they would still be in the temporal
+  // dead zone when it runs.
   let tornDown = false;
   let running = false;
+  let scrollTarget = 0;
+  let scrollNow = 0;
 
   let resizeQueued = false;
   let resizeRaf = 0;
@@ -275,7 +284,12 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
       resizeQueued = false;
       if (tornDown) return;
       fit();
-      if (!running) renderer.render(scene, camera);
+      readScroll();
+      // renderer.setSize (inside fit()) resets the canvas and clears the
+      // drawing buffer; when the loop is already running, frame() rendered
+      // this frame before the resize callback fired, so without a render
+      // here the painted frame is left blank.
+      renderer.render(scene, camera);
     });
   });
   ro.observe(container);
@@ -334,6 +348,16 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
     requestNext();
   }
 
+  // Registered before the first await below so a context loss during the
+  // opening screenshot load is still caught. `teardown` is a hoisted function
+  // declaration, so calling it here, ahead of its own definition, is safe.
+  const onLost = (e: Event) => {
+    e.preventDefault();
+    teardown();
+    opts.onContextLost?.();
+  };
+  glCanvas.addEventListener("webglcontextlost", onLost);
+
   // First screenshot: try each in order until one decodes. The scene still
   // starts (dark screen) if none does.
   const first = screens.length ? await loadFollowing(-1) : null;
@@ -351,8 +375,6 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
   let cycler: CyclerState = createCycler();
   const target: Rotation = { yaw: 0, pitch: 0 };
   const current: Rotation = { yaw: 0, pitch: 0 };
-  let scrollTarget = 0;
-  let scrollNow = 0;
 
   function readScroll() {
     const r = hero.getBoundingClientRect();
@@ -448,20 +470,13 @@ export async function mount(container: HTMLElement, opts: MountOptions): Promise
     document.removeEventListener("visibilitychange", onVisibility);
     hero.removeEventListener("pointermove", onPointerMove);
     hero.removeEventListener("pointerleave", onPointerLeave);
-    canvas.removeEventListener("webglcontextlost", onLost);
+    glCanvas.removeEventListener("webglcontextlost", onLost);
     currentTex?.dispose();
     nextTex?.dispose();
     for (const d of disposables) d.dispose();
     scene.environment = null;
     renderer.dispose();
   }
-
-  const onLost = (e: Event) => {
-    e.preventDefault();
-    teardown();
-    opts.onContextLost?.();
-  };
-  canvas.addEventListener("webglcontextlost", onLost);
 
   // First frame now, so the gate can reveal a finished picture, then start the loop
   // and the preload of the second screenshot.
