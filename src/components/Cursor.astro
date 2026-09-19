@@ -1,0 +1,26 @@
+<!-- Custom cursor — only activates on fine-pointer (mouse) devices -->
+<style is:global>
+  /* Hide native cursor when our custom one is active */
+  body.has-cursor,
+  body.has-cursor * { cursor: none !important; }
+
+  /* Brand-tint the follower dot */
+  .mf-cursor { color: var(--brand-bright); }
+  .mf-cursor:before { transition: transform .22s ease-in-out, opacity .1s, background .3s; }
+
+  /* Larger ring on hover of interactive elements */
+  .mf-cursor.-pointer:before { transform: scale(0.5); opacity: 0.7; }
+</style>
+
+<script>
+  // Only init on non-touch devices
+  if (window.matchMedia("(pointer: fine)").matches) {
+    import("gsap").then(({ gsap }) =>
+      import("mouse-follower").then(({ default: MouseFollower }) => {
+        MouseFollower.registerGSAP(gsap);
+        new MouseFollower({ speed: 0.65, ease: "expo.out", overwrite: true });
+        document.body.classList.add("has-cursor");
+      })
+    );
+  }
+</script>

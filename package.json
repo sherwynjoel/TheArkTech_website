@@ -13,6 +13,8 @@
     "@astrojs/tailwind": "^6.0.2",
     "@paper-design/shaders-react": "^0.0.76",
     "astro": "^5.13.2",
+    "gsap": "^3.15.0",
+    "mouse-follower": "^1.2.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tailwindcss": "^3.4.17"

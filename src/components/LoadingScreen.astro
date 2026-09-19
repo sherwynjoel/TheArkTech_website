@@ -1,0 +1,92 @@
+<!-- Branded loading screen that fades out after the page is ready -->
+<div id="loading-screen" aria-hidden="true">
+  <div class="ls-inner">
+    <img src="/logo.png" alt="" class="ls-logo" width="56" height="64" />
+    <span class="ls-name">TheArkTech</span>
+    <div class="ls-bar"><div class="ls-fill"></div></div>
+  </div>
+</div>
+
+<style>
+  #loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  #loading-screen.done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  /* Failsafe: if the script never runs, CSS alone clears the overlay */
+  #loading-screen { animation: ls-timeout 0.5s ease 2.5s forwards; }
+  @keyframes ls-timeout {
+    to { opacity: 0; visibility: hidden; }
+  }
+
+  .ls-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    animation: ls-in 0.5s ease both;
+  }
+
+  @keyframes ls-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .ls-logo {
+    width: 56px;
+    height: auto;
+    filter: drop-shadow(0 0 18px rgba(96,165,250,0.5));
+  }
+
+  .ls-name {
+    font-family: "Clash Display", sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+
+  .ls-bar {
+    width: 120px;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+  .ls-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--brand), var(--accent-cyan));
+    border-radius: 9999px;
+    animation: ls-load 1.2s ease forwards;
+  }
+  @keyframes ls-load {
+    from { width: 0%; }
+    to   { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #loading-screen { display: none; }
+  }
+</style>
+
+<script>
+  const screen = document.getElementById("loading-screen")!;
+  // Hide after 1.4s (bar finishes) or when page is loaded, whichever is later
+  const hide = () => screen.classList.add("done");
+  const timer = setTimeout(hide, 1450);
+  window.addEventListener("load", () => {
+    clearTimeout(timer);
+    setTimeout(hide, 200);
+  });
+</script>
