@@ -4,8 +4,6 @@
 
 // Trading / brand name, used everywhere the site speaks to customers.
 export const COMPANY_NAME = "TheArkTech";
-/** Client projects delivered to date. Shown in the hero and on /about. */
-export const PROJECTS_DELIVERED = 10;
 
 // Registered entity. LEGAL_NAME is the exact name on the certificate of
 // incorporation (it usually ends in "Private Limited" and may differ from the

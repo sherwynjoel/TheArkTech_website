@@ -5,6 +5,7 @@ import SiteFooter from "../../components/SiteFooter.astro";
 import SEO from "../../components/SEO.astro";
 import CallFab from "../../components/CallFab.astro";
 import { industries, type Industry } from "../../data/industries.ts";
+import { portfolioProjects, projectSlug } from "../../data/portfolio.ts";
 import { COMPANY_NAME, CITY, waLink } from "../../data/site";
 
 export function getStaticPaths() {
@@ -17,6 +18,8 @@ export function getStaticPaths() {
 const { industry } = Astro.props as { industry: Industry };
 const url = `https://thearktech.in/industries/${industry.slug}`;
 
+// Real client work in this sector, if any.
+const work = portfolioProjects.filter((p) => industry.sectors?.includes(p.sector));
 const others = industries.filter((i) => i.slug !== industry.slug).slice(0, 6);
 
 const enquiry = waLink(
@@ -86,6 +89,7 @@ const schema = {
             <a href={enquiry} target="_blank" rel="noopener noreferrer" class="btn-primary">
               Discuss your project
             </a>
+            <a href="/work" class="btn-glass">See our work</a>
           </div>
         </header>
 
@@ -97,6 +101,25 @@ const schema = {
                 <li><span class="ind-tick" aria-hidden="true">✓</span>{b}</li>
               ))}
             </ul>
+          </section>
+        )}
+
+        {work.length > 0 && (
+          <section class="ind-block">
+            <h2>{work.length === 1 ? "Client work in this sector" : `${work.length} client projects in this sector`}</h2>
+            <div class="ind-work">
+              {work.map((p) => (
+                <a href={`/work/${projectSlug(p)}`} class="ind-work-card">
+                  <img src={p.image} alt={`${p.title} — ${p.type}`} width="1280" height="800" loading="lazy" decoding="async" />
+                  <div class="ind-work-body">
+                    <span class="ind-work-sector">{p.type}</span>
+                    <span class="ind-work-title">{p.title}</span>
+                    <p>{p.summary}</p>
+                    <span class="ind-work-more">Read the case study →</span>
+                  </div>
+                </a>
+              ))}
+            </div>
           </section>
         )}
 
@@ -151,10 +174,24 @@ const schema = {
   .ind-list li { display: flex; gap: 0.6rem; color: var(--ink-muted); font-size: 0.95rem; }
   .ind-tick { color: var(--accent-cyan); flex: none; }
 
+  .ind-work { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+  .ind-work-card {
+    display: flex; flex-direction: column;
+    border-radius: 1.25rem; overflow: hidden;
+    background: var(--bg-elev); border: 1px solid var(--line);
+    transition: transform var(--dur-2) var(--ease-out-quart), border-color var(--dur-2) var(--ease-out-quart);
+  }
+  .ind-work-card:hover { transform: translateY(-4px); border-color: var(--line-brand); }
+  .ind-work-card img { width: 100%; height: 11rem; object-fit: cover; object-position: top; }
+  .ind-work-body { padding: 1.15rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  .ind-work-sector { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+  .ind-work-title { font-family: "Clash Display", sans-serif; font-weight: 600; font-size: 1.1rem; }
+  .ind-work-body p { margin: 0; font-size: 0.86rem; line-height: 1.6; color: var(--ink-muted); }
+  .ind-work-more { font-size: 0.83rem; color: var(--brand-bright); margin-top: 0.35rem; }
 
   .ind-others { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .ind-other {
-    padding: 0.7rem 1.1rem; min-height: 44px; display: inline-flex; align-items: center; border-radius: 9999px; font-size: 0.85rem;
+    padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem;
     background: var(--glass-bg); border: 1px solid var(--glass-brd); color: var(--ink-muted);
     transition: color var(--dur-2), border-color var(--dur-2);
   }

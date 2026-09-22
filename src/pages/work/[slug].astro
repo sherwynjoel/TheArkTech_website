@@ -1,0 +1,305 @@
+---
+import "../../styles/global.css";
+import Nav from "../../components/Nav.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+import SEO from "../../components/SEO.astro";
+import CallFab from "../../components/CallFab.astro";
+import { portfolioProjects, projectSlug, type PortfolioProject } from "../../data/portfolio.ts";
+import { COMPANY_NAME, waLink } from "../../data/site";
+
+export function getStaticPaths() {
+  return portfolioProjects.map((project) => ({
+    params: { slug: projectSlug(project) },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props as { project: PortfolioProject };
+const slug = projectSlug(project);
+const url = `https://thearktech.in/work/${slug}`;
+
+// Other work in the same sector first, then anything else, capped at three.
+const related = portfolioProjects
+  .filter((p) => projectSlug(p) !== slug)
+  .sort((a, b) => Number(b.sector === project.sector) - Number(a.sector === project.sector))
+  .slice(0, 3);
+
+const enquiry = waLink(
+  `Hi ${COMPANY_NAME}! 👋 I saw your ${project.title} project and would like to discuss something similar.`
+);
+
+const schema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CreativeWork",
+      name: `${project.title} — ${project.type}`,
+      description: project.summary,
+      url,
+      image: `https://thearktech.in${project.image}`,
+      about: project.sector,
+      creator: { "@id": "https://thearktech.in/#organization" },
+      ...(project.year ? { dateCreated: project.year } : {}),
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://thearktech.in/" },
+        { "@type": "ListItem", position: 2, name: "Work", item: "https://thearktech.in/work" },
+        { "@type": "ListItem", position: 3, name: project.title, item: url },
+      ],
+    },
+  ],
+};
+---
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <SEO
+      title={`${project.title} — ${project.type} | ${COMPANY_NAME}`}
+      description={project.summary}
+      url={url}
+      image={`https://thearktech.in${project.image}`}
+      siteName={COMPANY_NAME}
+      keywords={[...project.tags, project.sector, "case study"]}
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+  <body class="bg-bg text-ink">
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Nav />
+
+    <main id="main" tabindex="-1" class="cs glow-anchor">
+      <div class="container-x cs-wrap">
+        <nav class="cs-crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <span aria-hidden="true">/</span>
+          <a href="/work">Work</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{project.title}</span>
+        </nav>
+
+        <header class="cs-head">
+          <p class="eyebrow mb-3">{project.sector}</p>
+          <h1 class="font-display cs-title">{project.title}</h1>
+          <p class="cs-type">{project.type}{project.year ? ` · ${project.year}` : ""}</p>
+          <p class="cs-summary">{project.summary}</p>
+
+          <div class="cs-actions">
+            {project.url && (
+              <a href={project.url} target="_blank" rel="noopener noreferrer" class="btn-primary">
+                Visit the live site
+              </a>
+            )}
+            <a href={enquiry} target="_blank" rel="noopener noreferrer" class="btn-glass">
+              Discuss a similar project
+            </a>
+          </div>
+        </header>
+
+        <figure class="cs-shot">
+          <img
+            src={project.image}
+            alt={`${project.title} — ${project.type} screenshot`}
+            width="1280"
+            height="800"
+            loading="eager"
+            decoding="async"
+          />
+        </figure>
+
+        {project.metrics.length > 0 && (
+          <dl class="cs-metrics">
+            {project.metrics.map((m) => (
+              <div>
+                <dt>{m.value}</dt>
+                <dd>{m.label}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        {project.challenge && (
+          <section class="cs-block">
+            <h2>The challenge</h2>
+            <p>{project.challenge}</p>
+          </section>
+        )}
+
+        <section class="cs-block">
+          <h2>What we built</h2>
+          {project.approach ? (
+            <ul class="cs-list">
+              {project.approach.map((item) => (
+                <li><span class="cs-tick" aria-hidden="true">✓</span>{item}</li>
+              ))}
+            </ul>
+          ) : (
+            <ul class="cs-list">
+              {project.tags.map((tag) => (
+                <li><span class="cs-tick" aria-hidden="true">✓</span>{tag}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {project.outcome && (
+          <section class="cs-block">
+            <h2>The outcome</h2>
+            <p>{project.outcome}</p>
+          </section>
+        )}
+
+        {project.testimonial && (
+          <figure class="cs-quote">
+            <blockquote>{project.testimonial.quote}</blockquote>
+            <figcaption>
+              {project.testimonial.author}
+              {project.testimonial.role && <span> — {project.testimonial.role}</span>}
+            </figcaption>
+          </figure>
+        )}
+
+        {project.stack && project.stack.length > 0 && (
+          <section class="cs-block">
+            <h2>Stack</h2>
+            <div class="cs-tags">
+              {project.stack.map((t) => <span>{t}</span>)}
+            </div>
+          </section>
+        )}
+
+        {related.length > 0 && (
+          <section class="cs-block cs-related">
+            <h2>More work</h2>
+            <div class="cs-related-grid">
+              {related.map((p) => (
+                <a href={`/work/${projectSlug(p)}`} class="cs-related-card">
+                  <img src={p.image} alt="" width="1280" height="800" loading="lazy" decoding="async" />
+                  <div class="cs-related-body">
+                    <span class="cs-related-sector">{p.sector}</span>
+                    <span class="cs-related-title">{p.title}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section class="cs-cta">
+          <h2 class="font-display">Building something similar?</h2>
+          <p>Tell us what you need and we'll scope it, price it, and give you a timeline.</p>
+          <div class="cs-actions">
+            <a href={enquiry} target="_blank" rel="noopener noreferrer" class="btn-primary">Start a project</a>
+            <a href="/contact" class="btn-glass">Contact us</a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <SiteFooter />
+    <CallFab />
+  </body>
+</html>
+
+<style>
+  .cs { padding: 7.5rem 0 5rem; }
+  .cs-wrap { max-width: 62rem; }
+
+  .cs-crumbs {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    font-size: 0.82rem; color: var(--ink-faint); margin-bottom: 2.5rem;
+  }
+  .cs-crumbs a:hover { color: var(--brand-bright); }
+
+  .cs-head { max-width: 46rem; }
+  .cs-title { font-size: clamp(2.1rem, 5vw, 3.4rem); line-height: 1.05; margin: 0; }
+  .cs-type { margin: 0.6rem 0 0; font-size: 0.9rem; color: var(--brand-bright); }
+  .cs-summary { margin-top: 1.1rem; color: var(--ink-muted); line-height: 1.75; font-size: 1.05rem; }
+
+  .cs-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+
+  .cs-shot {
+    margin: 3rem 0 0;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  }
+  .cs-shot img { width: 100%; height: auto; }
+
+  .cs-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+    margin: 2rem 0 0;
+  }
+  .cs-metrics > div {
+    padding: 1.25rem;
+    border-radius: 1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-brd);
+  }
+  .cs-metrics dt {
+    font-family: "Clash Display", sans-serif;
+    font-size: 1.6rem; font-weight: 700; color: var(--brand-bright);
+  }
+  .cs-metrics dd { margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--ink-faint); }
+
+  .cs-block { margin-top: 3.25rem; }
+  .cs-block h2 {
+    font-family: "Clash Display", sans-serif;
+    font-size: 1.35rem; font-weight: 600; margin: 0 0 1rem;
+  }
+  .cs-block p { color: var(--ink-muted); line-height: 1.75; margin: 0; }
+
+  .cs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+  @media (min-width: 640px) { .cs-list { grid-template-columns: 1fr 1fr; gap: 0.6rem 2rem; } }
+  .cs-list li { display: flex; gap: 0.6rem; color: var(--ink-muted); font-size: 0.95rem; }
+  .cs-tick { color: var(--accent-cyan); flex: none; }
+
+  .cs-quote {
+    margin: 3.25rem 0 0; padding: 1.75rem;
+    border-left: 2px solid var(--brand);
+    background: var(--glass-bg);
+    border-radius: 0 1rem 1rem 0;
+  }
+  .cs-quote blockquote {
+    margin: 0; font-size: 1.1rem; line-height: 1.7; color: var(--ink);
+    font-family: "Clash Display", sans-serif; font-weight: 600;
+  }
+  .cs-quote figcaption { margin-top: 0.85rem; font-size: 0.85rem; color: var(--ink-faint); }
+
+  .cs-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .cs-tags span {
+    font-size: 0.75rem; padding: 4px 11px; border-radius: 9999px;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: var(--brand-bright);
+  }
+
+  .cs-related-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+  .cs-related-card {
+    border-radius: 1rem; overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--bg-elev);
+    transition: transform var(--dur-2) var(--ease-out-quart), border-color var(--dur-2) var(--ease-out-quart);
+  }
+  .cs-related-card:hover { transform: translateY(-3px); border-color: var(--line-brand); }
+  .cs-related-card img { width: 100%; height: 9rem; object-fit: cover; object-position: top; }
+  .cs-related-body { padding: 0.9rem 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.2rem; }
+  .cs-related-sector { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+  .cs-related-title { font-family: "Clash Display", sans-serif; font-weight: 600; }
+
+  .cs-cta {
+    margin-top: 4rem; padding: clamp(1.75rem, 4vw, 2.75rem);
+    border-radius: 1.5rem; text-align: center;
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(8, 12, 22, 0.8));
+    border: 1px solid var(--line-brand);
+  }
+  .cs-cta h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0; }
+  .cs-cta p { margin: 0.75rem 0 0; color: var(--ink-muted); }
+  .cs-cta .cs-actions { justify-content: center; }
+</style>

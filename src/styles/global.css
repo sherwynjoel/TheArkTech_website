@@ -169,7 +169,7 @@ img { display: block; max-width: 100%; }
   align-items: center; justify-content: center; gap: 0.6rem;
   padding: 0.95rem 1.75rem;
   border-radius: 9999px;
-  background: linear-gradient(120deg, var(--brand-deep), var(--brand-strong));
+  background: linear-gradient(120deg, var(--brand-deep), var(--brand) 60%, var(--brand-bright));
   color: #fff;
   font-weight: 600;
   border: none;

@@ -3,7 +3,6 @@ import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SEO from "../components/SEO.astro";
-import Contact from "../components/Contact.astro";
 import {
   COMPANY_NAME, LEGAL_DISPLAY_NAME, COMPANY_TYPE, CIN, GSTIN,
   EMAIL, PHONE_E164, PHONE_LABEL, PHONE_2_E164, PHONE_2_LABEL, WHATSAPP_NUMBER,
@@ -80,7 +79,7 @@ const whatsappUrl = waLink(
             Message us on WhatsApp
           </a>
           <a href={`mailto:${EMAIL}`} class="btn-glass">Send an email</a>
-          <a href="#contact" class="btn-glass">Use the enquiry form</a>
+          <a href="/#contact" class="btn-glass">Use the enquiry form</a>
         </div>
 
         <section class="contact-details">
@@ -105,7 +104,6 @@ const whatsappUrl = waLink(
           </dl>
         </section>
       </div>
-      <Contact eyebrow="Enquiry form" heading="Or send us the details" />
     </main>
     <SiteFooter />
   </body>
