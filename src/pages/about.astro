@@ -65,6 +65,10 @@ const schema = {
         eyebrow="About us"
         support={`A software company in ${LOCATION.split(",")[0]}.`}
         enterLabel="Read our story"
+        actions={[
+          { label: "See our work", href: "/work" },
+          { label: "Talk to us", href: enquiry, external: true },
+        ]}
       >
         <header class="ab-head">
           <p class="eyebrow mb-3">About us</p>
@@ -78,10 +82,6 @@ const schema = {
             We've delivered {portfolioProjects.length} client projects
             — {liveCount} of them are live and you can visit every one.
           </p>
-          <div class="ab-actions">
-            <a href="/work" class="btn-primary">See our work</a>
-            <a href={enquiry} target="_blank" rel="noopener noreferrer" class="btn-glass">Talk to us</a>
-          </div>
         </header>
       </AboutPortal>
 

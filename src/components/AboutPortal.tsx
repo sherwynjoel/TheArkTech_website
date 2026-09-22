@@ -1,5 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import GlyphPortal from "@/components/ui/glyph-portal";
+import { LiquidLink } from "@/components/ui/liquid-glass-button";
+
+export type AboutAction = { label: string; href: string; external?: boolean };
 
 /**
  * The About page opener: the Glyph Portal (21st.dev) set in the site's own
@@ -18,12 +21,15 @@ export default function AboutPortal({
   eyebrow,
   support,
   enterLabel = "Read our story",
+  actions = [],
   children,
 }: {
   word?: string;
   eyebrow?: string;
   support?: string;
   enterLabel?: string;
+  /** Buttons under the revealed header, rendered as liquid-glass links. */
+  actions?: AboutAction[];
   children?: ReactNode;
 }) {
   const [ready, setReady] = useState(false);
@@ -61,6 +67,8 @@ export default function AboutPortal({
         [data-about-portal] [data-ab-support]{position:absolute;inset:calc(var(--gp-word-bottom,50%) + 30px) 24px auto;margin:0;text-align:center;font:400 16px/1.5 Satoshi,ui-sans-serif,system-ui,sans-serif;color:var(--ink-muted);}
         [data-about-portal] [data-gp-content]{padding:6rem clamp(1rem,4vw,1.5rem) 4rem;}
         [data-about-portal] [data-ab-inner]{width:100%;max-width:58rem;margin-inline:auto;}
+        [data-about-portal] [data-ab-actions]{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.75rem;max-width:44rem;}
+        [data-about-portal] [data-ab-actions] [style*="container-glass"]{border-radius:9999px;}
         @container(max-height:479px){[data-about-portal] [data-ab-support]{top:calc(var(--gp-word-bottom,50%) + 14px);}[data-about-portal] [data-gp-caption]{top:calc(var(--gp-word-bottom,50%) + 58px);}}
       `}</style>
       <GlyphPortal
@@ -97,7 +105,24 @@ export default function AboutPortal({
         }
       >
         {/* Astro slots island children in a display:contents wrapper, so the column width lives on this div. */}
-        <div data-ab-inner>{children}</div>
+        <div data-ab-inner>
+          {children}
+          {actions.length > 0 && (
+            <div data-ab-actions className="dark">
+              {actions.map((action) => (
+                <LiquidLink
+                  key={action.href}
+                  href={action.href}
+                  size="xl"
+                  className="rounded-full text-ink font-semibold"
+                  {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                >
+                  {action.label}
+                </LiquidLink>
+              ))}
+            </div>
+          )}
+        </div>
       </GlyphPortal>
     </div>
   );
