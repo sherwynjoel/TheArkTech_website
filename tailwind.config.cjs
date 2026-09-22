@@ -1,3 +1,24 @@
+const { default: flattenColorPalette } = require("tailwindcss/lib/util/flattenColorPalette");
+
+/**
+ * Aceternity UI's recommended plugin: exposes every Tailwind palette colour as
+ * a CSS variable (--slate-900, --blue-500, ...) so their components can use
+ * `var(--blue-500)` in gradients and beams.
+ *
+ * Adapted for this site: colours whose value is itself a var() or hsl(var())
+ * expression (the site's own tokens and the shadcn tokens) are skipped, since
+ * emitting `--bg: var(--bg)` would make those variables cyclic and invalid.
+ */
+function addVariablesForColors({ addBase, theme }) {
+  const allColors = flattenColorPalette(theme("colors"));
+  const vars = Object.fromEntries(
+    Object.entries(allColors)
+      .filter(([, value]) => typeof value === "string" && !value.includes("var("))
+      .map(([key, value]) => [`--${key}`, value]),
+  );
+  addBase({ ":root": vars });
+}
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     darkMode: ["class"],
@@ -85,5 +106,5 @@ module.exports = {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), addVariablesForColors],
 };
