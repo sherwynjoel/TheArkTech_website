@@ -4,6 +4,7 @@ import Nav from "../components/Nav.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SEO from "../components/SEO.astro";
 import CallFab from "../components/CallFab.astro";
+import AboutPortal from "../components/AboutPortal.tsx";
 import { services } from "../data/services.ts";
 import { portfolioProjects } from "../data/portfolio.ts";
 import { industries } from "../data/industries.ts";
@@ -41,6 +42,7 @@ const schema = {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="preload" href="/fonts/ClashDisplay-Bold.woff2" as="font" type="font/woff2" crossorigin />
     <SEO
       title={`About ${COMPANY_NAME} — Software Development Company in ${LOCATION}`}
       description={`${COMPANY_NAME} is a ${COMPANY_TYPE.toLowerCase()} in ${LOCATION} building web and mobile applications, custom software, cloud infrastructure, and AI automation. ${portfolioProjects.length} client projects delivered.`}
@@ -55,8 +57,15 @@ const schema = {
     <a href="#main" class="skip-link">Skip to content</a>
     <Nav />
 
-    <main id="main" tabindex="-1" class="ab glow-anchor">
-      <div class="container-x ab-wrap">
+    <main id="main" tabindex="-1" class="glow-anchor">
+      <!-- Opener: the word ARKTECH fills the screen; scrolling dives through a letter into the header below. -->
+      <AboutPortal
+        client:load
+        word="ARKTECH"
+        eyebrow="About us"
+        support={`A software company in ${LOCATION.split(",")[0]}.`}
+        enterLabel="Read our story"
+      >
         <header class="ab-head">
           <p class="eyebrow mb-3">About us</p>
           <h1 class="font-display ab-title">
@@ -74,7 +83,9 @@ const schema = {
             <a href={enquiry} target="_blank" rel="noopener noreferrer" class="btn-glass">Talk to us</a>
           </div>
         </header>
+      </AboutPortal>
 
+      <div class="ab container-x ab-wrap">
         {STORY.length > 0 && (
           <section class="ab-block">
             <h2>Our story</h2>
@@ -148,7 +159,7 @@ const schema = {
 </html>
 
 <style>
-  .ab { padding: 7.5rem 0 5rem; }
+  .ab { padding: 4rem 0 5rem; }
   .ab-wrap { max-width: 58rem; }
 
   .ab-head { max-width: 44rem; }
