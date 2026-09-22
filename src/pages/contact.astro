@@ -3,10 +3,11 @@ import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SEO from "../components/SEO.astro";
+import ContactCard3D from "../components/ContactCard3D.tsx";
 import {
   COMPANY_NAME, LEGAL_DISPLAY_NAME, COMPANY_TYPE, CIN, GSTIN,
   EMAIL, PHONE_E164, PHONE_LABEL, PHONE_2_E164, PHONE_2_LABEL, WHATSAPP_NUMBER,
-  ADDRESS_LINES, LOCATION, HOURS_LABEL, RESPONSE_TIME, waLink,
+  ADDRESS_LINES, CITY, LOCATION, HOURS_LABEL, RESPONSE_TIME, waLink,
 } from "../data/site";
 
 const whatsappUrl = waLink(
@@ -33,13 +34,27 @@ const whatsappUrl = waLink(
     <main id="main" tabindex="-1" class="contact-page glow-anchor">
       <div class="container-x contact-wrap">
         <header class="contact-head">
-          <p class="eyebrow mb-3">Contact us</p>
-          <h1 class="font-display contact-title">Talk to {COMPANY_NAME}</h1>
-          <p class="contact-lede">
-            We're a {COMPANY_TYPE.toLowerCase()} based in {LOCATION}, building
-            websites, web and mobile applications, and AI-powered automation.
-            Reach us on any channel below — {RESPONSE_TIME.toLowerCase()}
-          </p>
+          <div class="contact-head-text">
+            <p class="eyebrow mb-3">Contact us</p>
+            <h1 class="font-display contact-title">Talk to {COMPANY_NAME}</h1>
+            <p class="contact-lede">
+              We're a {COMPANY_TYPE.toLowerCase()} based in {LOCATION}, building
+              websites, web and mobile applications, and AI-powered automation.
+              Reach us on any channel below — {RESPONSE_TIME.toLowerCase()}
+            </p>
+          </div>
+          <!-- 3D business card: hover (or tap) flips it to the contact details -->
+          <div class="contact-head-card">
+            <ContactCard3D
+              client:load
+              name={COMPANY_NAME}
+              tagline={`Software development · ${CITY}`}
+              email={EMAIL}
+              phones={[PHONE_LABEL, PHONE_2_LABEL]}
+              location={LOCATION}
+              site="thearktech.in"
+            />
+          </div>
         </header>
 
         <!-- Primary contact channels, in plain selectable text -->
@@ -113,7 +128,20 @@ const whatsappUrl = waLink(
   .contact-page { padding: 8rem 0 5rem; min-height: 70svh; }
   .contact-wrap { max-width: 58rem; }
 
-  .contact-head { max-width: 42rem; }
+  .contact-head {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  .contact-head-text { max-width: 42rem; }
+  .contact-head-card { width: 100%; max-width: 26rem; justify-self: center; }
+  @media (min-width: 768px) {
+    .contact-head {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+      gap: 3rem;
+    }
+    .contact-head-card { justify-self: end; }
+  }
   .contact-title { font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.05; margin: 0; }
   .contact-lede { margin-top: 1rem; color: var(--ink-muted); line-height: 1.7; }
 
