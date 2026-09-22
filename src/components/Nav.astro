@@ -3,6 +3,7 @@
 // a bare "#contact" is a dead link on every page except the homepage.
 // `spy` keeps the scroll-spy matching against the homepage section ids.
 import NavRoll from "./NavRoll.tsx";
+import NavRollMobile from "./NavRollMobile.tsx";
 
 const links = [
   { href: "/#services", spy: "#services", label: "Services" },
@@ -31,8 +32,10 @@ const links = [
   </div>
   <div id="nav-mobile" class="md:hidden hidden container-x pb-4">
     <div class="glass glass-blur rounded-2xl p-3 flex flex-col gap-1">
-      {links.map((l) => (
-        <a href={l.href} data-nav={l.spy} class="nav-link px-4 py-3 rounded-xl text-sm font-medium text-ink-muted hover:text-ink hover:bg-white/10 transition">{l.label}</a>
+      {links.map((l, i) => (
+        <a href={l.href} data-nav={l.spy} aria-label={l.label} class="nav-link block px-4 py-3 rounded-xl text-sm font-medium text-ink-muted hover:text-ink hover:bg-white/10 transition">
+          <NavRollMobile client:visible text={l.label} index={i} />
+        </a>
       ))}
       <a href="/#contact" class="btn-glass mt-1">Get Quote</a>
     </div>

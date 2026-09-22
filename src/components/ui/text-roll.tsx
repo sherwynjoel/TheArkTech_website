@@ -11,14 +11,21 @@ export default function TextRoll({
   children,
   className,
   center = false,
+  active,
 }: {
   children: string
   className?: string
   center?: boolean
+  /**
+   * Site addition: drive the roll without a pointer (e.g. when a mobile menu
+   * opens). Leave undefined to keep the original hover-only behaviour.
+   */
+  active?: boolean
 }) {
   return (
     <motion.span
       initial="initial"
+      animate={active === undefined ? undefined : active ? "hovered" : "initial"}
       whileHover="hovered"
       className={cn(
         "relative block overflow-hidden text-black dark:text-white/90",
