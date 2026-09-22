@@ -16,6 +16,14 @@ export type AboutAction = { label: string; href: string; external?: boolean };
  */
 const FACE = '"Clash Display", "Arial Black", Arial, sans-serif';
 
+/**
+ * Scroll travel through the letter, in viewport heights. Phones get a shorter
+ * dive: at 2.2 a reader swipes through ~1400px of empty field before the
+ * header fades in; 1.5 keeps the effect and halves the blank stretch.
+ */
+const TRAVEL = 2.2;
+const TRAVEL_PHONE = 1.5;
+
 export default function AboutPortal({
   word = "ARKTECH",
   eyebrow,
@@ -33,9 +41,11 @@ export default function AboutPortal({
   children?: ReactNode;
 }) {
   const [ready, setReady] = useState(false);
+  const [travel, setTravel] = useState(TRAVEL);
 
   useEffect(() => {
     let settled = false;
+    setTravel(window.matchMedia("(max-width: 767px)").matches ? TRAVEL_PHONE : TRAVEL);
     const finish = () => {
       if (!settled) {
         settled = true;
@@ -61,8 +71,7 @@ export default function AboutPortal({
         [data-about-portal] [data-gp-caption]{inset:calc(var(--gp-word-bottom,50%) + 84px) 24px auto;justify-content:center;}
         [data-about-portal] [data-gp-enter]{min-height:46px;padding:0 22px;gap:18px;border-radius:9999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#fff;font:500 14px/1 Satoshi,ui-sans-serif,system-ui,sans-serif;transition:background var(--dur-2,.28s),border-color var(--dur-2,.28s);}
         [data-about-portal] [data-gp-enter]:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);}
-        [data-about-portal] [data-gp-touch-picker]{top:auto;bottom:18px;left:50%;color:var(--ink-faint);}
-        [data-about-portal] [data-gp-select]{border-color:rgba(255,255,255,.14);border-radius:9999px;background:#000;color:#fff;font-size:12px;}
+        [data-about-portal] [data-gp-touch-picker]{display:none;}
         [data-about-portal] [data-ab-eyebrow]{position:absolute;inset:auto 24px calc(100% - var(--gp-word-top,35%) + 30px);margin:0;text-align:center;font:500 12px/1.5 Satoshi,ui-sans-serif,system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);}
         [data-about-portal] [data-ab-support]{position:absolute;inset:calc(var(--gp-word-bottom,50%) + 30px) 24px auto;margin:0;text-align:center;font:400 16px/1.5 Satoshi,ui-sans-serif,system-ui,sans-serif;color:var(--ink-muted);}
         [data-about-portal] [data-gp-content]{padding:6rem clamp(1rem,4vw,1.5rem) 4rem;}
@@ -70,12 +79,18 @@ export default function AboutPortal({
         [data-about-portal] [data-ab-actions]{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.75rem;max-width:44rem;}
         [data-about-portal] [data-ab-actions] [style*="container-glass"]{border-radius:9999px;}
         @container(max-height:479px){[data-about-portal] [data-ab-support]{top:calc(var(--gp-word-bottom,50%) + 14px);}[data-about-portal] [data-gp-caption]{top:calc(var(--gp-word-bottom,50%) + 58px);}}
+        @media(max-width:639px){
+          [data-about-portal] [data-gp-content]{padding:5.5rem 1rem 2.5rem;}
+          [data-about-portal] [data-gp-caption]{inset:calc(var(--gp-word-bottom,50%) + 76px) 16px auto;}
+          [data-about-portal] [data-ab-support]{font-size:15px;}
+          [data-about-portal] [data-ab-actions]{margin-top:1.4rem;}
+        }
       `}</style>
       <GlyphPortal
         word={word}
         fontFamily={FACE}
         fontWeight={700}
-        scrollLength={2.2}
+        scrollLength={travel}
         interactive
         annotations={false}
         enterLabel={enterLabel}

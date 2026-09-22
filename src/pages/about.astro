@@ -159,7 +159,7 @@ const schema = {
 </html>
 
 <style>
-  .ab { padding: 4rem 0 5rem; }
+  .ab { padding-block: 4rem 5rem; } /* padding-block only: the container-x side padding must survive on phones */
   .ab-wrap { max-width: 58rem; }
 
   .ab-head { max-width: 44rem; }
@@ -218,4 +218,18 @@ const schema = {
   .ab-address strong { color: var(--ink); font-family: "Clash Display", sans-serif; }
   .ab-address a { color: var(--brand-bright); }
   .ab-contact-btn { margin-top: 1.25rem; }
+  .ab-address a { display: inline-block; padding: 0.3rem 0; }
+
+  /* Phones: let the title wrap on its own, tighten the rhythm, and keep the process steps compact. */
+  @media (max-width: 639px) {
+    .ab-title br { display: none; }
+    .ab-title { font-size: clamp(2rem, 9vw, 2.4rem); }
+    .ab-lede { font-size: 1rem; margin-top: 1rem; }
+    .ab { padding-block: 2.5rem 4rem; }
+    .ab-block { margin-top: 2.75rem; }
+    .ab-block h2 { font-size: 1.25rem; margin-bottom: 1rem; }
+    .ab-process { gap: 1.25rem; }
+    .ab-process li { gap: 1rem; }
+    .ab-step { font-size: 1.3rem; }
+  }
 </style>
