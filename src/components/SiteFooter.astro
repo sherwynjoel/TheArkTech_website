@@ -1,87 +1,146 @@
 ---
-import { EMAIL as email, PHONE_E164 as phone, PHONE_LABEL as phoneLabel, PHONE_2_E164 as phone2, PHONE_2_LABEL as phone2Label, ADDRESS_LINES, HOURS_LABEL, LEGAL_DISPLAY_NAME, CIN } from "../data/site";
+/**
+ * Site footer in the 21st.dev "hover footer" layout: a rounded card with a
+ * four-column grid, a divider, the copyright row, and the big hover-reveal
+ * wordmark tucked under the content on desktop, over a radial gradient.
+ *
+ * All text is server-rendered here in Astro; only the wordmark
+ * (TextHoverEffect) is a React island, hydrated when scrolled into view.
+ * Contact details come from src/data/site.ts.
+ */
+import { TextHoverEffect } from "@/components/ui/hover-footer";
+import {
+  COMPANY_NAME,
+  EMAIL as email,
+  PHONE_E164 as phone,
+  PHONE_LABEL as phoneLabel,
+  PHONE_2_E164 as phone2,
+  PHONE_2_LABEL as phone2Label,
+  ADDRESS_LINES,
+  HOURS_LABEL,
+  LOCATION,
+  LEGAL_DISPLAY_NAME,
+  CIN,
+} from "../data/site";
 
 const year = new Date().getFullYear();
+
+const linkSections = [
+  {
+    title: "Explore",
+    links: [
+      { label: "Services", href: "/#services" },
+      { label: "Work", href: "/work" },
+      { label: "Industries", href: "/#industries" },
+      { label: "FAQ", href: "/#faq" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About", href: "/about" },
+      { label: "Contact", href: "/contact" },
+      { label: "Terms & Conditions", href: "/terms" },
+      { label: "Privacy Policy", href: "/privacy" },
+    ],
+  },
+];
 ---
-<footer class="relative overflow-hidden border-t" style="border-color: var(--hairline);">
-  {/* 6.7MB at ~6% effective visibility behind a scrim: never preloaded, and only
-      attached on wide screens with motion allowed. The gradient below stands in
-      everywhere else, which is visually near-identical through the scrim. */}
-  <div class="footer-fallback absolute inset-0" aria-hidden="true"></div>
-  <video id="footer-bg" muted loop playsinline preload="none"
-         class="absolute inset-0 w-full h-full object-cover opacity-30"></video>
-  <div class="absolute inset-0 bg-black/80"></div>
 
-  <style>
-    .footer-fallback {
-      background:
-        radial-gradient(60% 80% at 20% 0%, rgba(30, 58, 138, 0.55), transparent 70%),
-        radial-gradient(50% 70% at 85% 100%, rgba(34, 211, 238, 0.14), transparent 70%),
-        #04060d;
-    }
-  </style>
-
-  <script>
-    // Only pay 6.7MB where it can actually be seen and motion is welcome.
-    const video = document.getElementById("footer-bg") as HTMLVideoElement | null;
-    const allowed =
-      window.matchMedia("(min-width: 1024px)").matches &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
-      !(navigator as any).connection?.saveData;
-
-    if (video && allowed && "IntersectionObserver" in window) {
-      const io = new IntersectionObserver(
-        (entries) => {
-          if (!entries[0].isIntersecting) return;
-          io.disconnect();
-          video.src = "/footer bg.mp4";
-          video.play().catch(() => {});
-        },
-        { rootMargin: "200px" }
-      );
-      io.observe(video);
-    }
-  </script>
-  <div class="relative container-x py-16 grid gap-10 sm:grid-cols-2 md:grid-cols-4">
-    <div class="md:col-span-2">
-      <div class="flex items-center gap-3">
-        <img src="/logo.png" alt="TheArkTech logo" width="48" height="40" class="h-10 w-12 object-contain" />
-        <span class="font-display text-xl font-bold">TheArkTech</span>
+<footer class="site-footer relative overflow-hidden rounded-3xl m-4 md:m-8 text-ink-muted">
+  <div class="relative z-40 max-w-7xl mx-auto p-8 sm:p-10 lg:p-14">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
+      <!-- Brand -->
+      <div class="flex flex-col space-y-4">
+        <div class="flex items-center gap-3">
+          <img src="/logo.png" alt="TheArkTech logo" width="48" height="40" class="h-10 w-12 object-contain" />
+          <span class="font-display text-2xl font-bold text-ink">{COMPANY_NAME}</span>
+        </div>
+        <p class="text-sm leading-relaxed">
+          A software development company building web and mobile applications,
+          custom software, cloud infrastructure, and AI automation.
+        </p>
       </div>
-      <p class="mt-4 max-w-sm text-ink-muted">A software development company building web and mobile applications, custom software, cloud infrastructure, and AI automation.</p>
+
+      <!-- Link columns -->
+      {linkSections.map((section) => (
+        <div>
+          <h4 class="text-ink text-lg font-semibold mb-6">{section.title}</h4>
+          <ul class="space-y-3">
+            {section.links.map((link) => (
+              <li>
+                <a href={link.href} class="hover:text-brand-bright transition-colors">{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+
+      <!-- Contact -->
+      <div>
+        <h4 class="text-ink text-lg font-semibold mb-6">Contact Us</h4>
+        <ul class="space-y-4">
+          <li class="flex items-center gap-3">
+            <svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <a href={`mailto:${email}`} class="hover:text-brand-bright transition-colors">{email}</a>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>
+              <a href={`tel:${phone}`} class="hover:text-brand-bright transition-colors">{phoneLabel}</a>
+              <span class="text-ink-faint"> · </span>
+              <a href={`tel:${phone2}`} class="hover:text-brand-bright transition-colors">{phone2Label}</a>
+            </span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="footer-icon mt-0.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <address class="not-italic">
+              {ADDRESS_LINES.map((line) => <span class="block">{line}</span>)}
+            </address>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="text-sm">{HOURS_LABEL}</span>
+          </li>
+        </ul>
+      </div>
     </div>
-    <div>
-      <p class="eyebrow mb-4">Explore</p>
-      <ul class="space-y-2 text-ink-muted">
-        <li><a href="/#services" class="hover:text-ink">Services</a></li>
-        <li><a href="/work" class="hover:text-ink">Work</a></li>
-        <li><a href="/about" class="hover:text-ink">About</a></li>
-        <li><a href="/#industries" class="hover:text-ink">Industries</a></li>
-        <li><a href="/#faq" class="hover:text-ink">FAQ</a></li>
-        <li><a href="/contact" class="hover:text-ink">Contact</a></li>
-      </ul>
-    </div>
-    <div>
-      <p class="eyebrow mb-4">Get in touch</p>
-      <address class="not-italic space-y-2 text-ink-muted">
-        <div><a href={`mailto:${email}`} class="hover:text-ink">{email}</a></div>
-        <div><a href={`tel:${phone}`} class="hover:text-ink">{phoneLabel}</a></div>
-        <div><a href={`tel:${phone2}`} class="hover:text-ink">{phone2Label}</a></div>
-        {ADDRESS_LINES.map((line) => <div>{line}</div>)}
-        <div class="text-ink-faint text-sm pt-1">{HOURS_LABEL}</div>
-      </address>
+
+    <hr class="my-8 border-0 border-t" style="border-color: var(--line);" />
+
+    <!-- Bottom row -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
+      <p class="text-center md:text-left">
+        &copy; {year} {LEGAL_DISPLAY_NAME}. All rights reserved.
+        {CIN && <span class="block sm:inline sm:ml-2">CIN: {CIN}</span>}
+      </p>
+      <p class="text-ink-faint">{LOCATION}</p>
     </div>
   </div>
-  <div class="relative container-x border-t py-6 text-sm text-ink-faint flex flex-col sm:flex-row justify-between items-center gap-4" style="border-color: var(--hairline);">
-    <span>
-      &copy; {year} {LEGAL_DISPLAY_NAME}. All rights reserved.
-      {CIN && <span class="block sm:inline sm:ml-2">CIN: {CIN}</span>}
-    </span>
-    <div class="flex flex-wrap justify-center gap-4">
-      <a href="/contact" class="hover:text-ink transition-colors">Contact</a>
-      <a href="/terms" class="hover:text-ink transition-colors">Terms & Conditions</a>
-      <a href="/privacy" class="hover:text-ink transition-colors">Privacy Policy</a>
-    </div>
+
+  <!-- Hover-reveal wordmark: desktop only, tucked under the content as in the demo -->
+  <div class="hidden lg:flex h-[30rem] -mt-52 -mb-36">
+    <TextHoverEffect client:visible text={COMPANY_NAME} viewBoxWidth={620} className="z-50" />
   </div>
+
+  <!-- Radial gradient background (the demo's FooterBackgroundGradient, in brand blue) -->
+  <div class="absolute inset-0 z-0" aria-hidden="true" style="background: radial-gradient(125% 125% at 50% 10%, #0F0F1166 50%, #60a5fa33 100%);"></div>
 </footer>
 
+<style>
+  .site-footer {
+    background: rgba(15, 15, 17, 0.1);
+    border: 1px solid var(--hairline);
+  }
+  .footer-icon {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    color: var(--brand-bright);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>
