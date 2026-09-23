@@ -4,6 +4,7 @@
 // `spy` keeps the scroll-spy matching against the homepage section ids.
 import NavRoll from "./NavRoll.tsx";
 import NavRollMobile from "./NavRollMobile.tsx";
+import { PHONE_E164, PHONE_LABEL, EMAIL } from "../data/site";
 
 const links = [
   { href: "/#services", spy: "#services", label: "Services" },
@@ -30,15 +31,23 @@ const links = [
       <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
   </div>
-  <div id="nav-mobile" class="md:hidden hidden container-x pb-4">
-    <div class="glass glass-blur rounded-2xl p-3 flex flex-col gap-1">
-      {links.map((l, i) => (
-        <a href={l.href} data-nav={l.spy} aria-label={l.label} class="nav-link block px-4 py-3 rounded-xl text-sm font-medium text-ink-muted hover:text-ink hover:bg-white/10 transition">
-          <NavRollMobile client:visible text={l.label} index={i} />
-        </a>
-      ))}
-      <a href="/#contact" class="btn-glass mt-1">Get Quote</a>
-    </div>
+  <div id="nav-mobile" class="md:hidden hidden nav-sheet">
+    <nav class="container-x nav-sheet-inner" aria-label="Site">
+      <ul class="nav-sheet-links">
+        {links.map((l, i) => (
+          <li>
+            <a href={l.href} data-nav={l.spy} aria-label={l.label} class="nav-link nav-sheet-link">
+              <NavRollMobile client:visible text={l.label} index={i} />
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a href="/#contact" class="btn-primary nav-sheet-cta">Get a quote</a>
+      <div class="nav-sheet-contact">
+        <a href={`tel:${PHONE_E164}`} class="nav-sheet-phone">{PHONE_LABEL}</a>
+        <a href={`mailto:${EMAIL}`} class="nav-sheet-mail">{EMAIL}</a>
+      </div>
+    </nav>
   </div>
 </header>
 
@@ -57,6 +66,9 @@ const links = [
   function setMenu(open: boolean, returnFocus = false) {
     if (!menu || !toggle) return;
     menu.classList.toggle("hidden", !open);
+    nav?.classList.toggle("nav-open", open);
+    document.body.style.overflow = open ? "hidden" : "";
+    document.body.classList.toggle("menu-open", open);
     toggle.setAttribute("aria-expanded", String(open));
     toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
     if (open) {
@@ -123,6 +135,53 @@ const links = [
 
   /* Active section — a quiet, persistent highlight (not a shouty pill). */
   .nav-link.is-current { color: var(--ink); background: rgba(96, 165, 250, 0.14); }
-  #nav-mobile .nav-link.is-current { background: rgba(96, 165, 250, 0.12); }
+  #nav-mobile .nav-link.is-current { color: var(--brand-bright); }
+
+  /* Mobile menu: a full-screen sheet behind the header bar (z-index -1 keeps
+     the logo and the close button on top inside the header's own stacking context). */
+  #site-nav.nav-open { background: #000; }
+  :global(body.menu-open .call-fab) { display: none; }
+  .nav-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: #000;
+    overflow-y: auto;
+    padding-top: 5.25rem;
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  }
+  .nav-sheet-inner { min-height: 100%; display: flex; flex-direction: column; }
+  .nav-sheet-links { list-style: none; margin: 1rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+  .nav-sheet-link {
+    display: block;
+    padding: 0.5rem 0;
+    font-family: "Clash Display", sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 9vw, 2.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .nav-sheet-cta {
+    margin-top: 2rem;
+    width: 100%;
+    justify-content: center;
+    padding: 1.05rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .nav-sheet-contact {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .nav-sheet-phone { font-family: "Clash Display", sans-serif; font-weight: 700; font-size: 1.45rem; color: var(--brand-bright); }
+  .nav-sheet-mail { color: var(--ink-faint); font-size: 1rem; overflow-wrap: anywhere; }
 </style>
 
