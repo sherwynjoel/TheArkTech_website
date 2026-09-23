@@ -5,8 +5,9 @@ import SiteFooter from "../components/SiteFooter.astro";
 import SEO from "../components/SEO.astro";
 import CallFab from "../components/CallFab.astro";
 import AboutPortal from "../components/AboutPortal.tsx";
+import ProsePreviewLinks from "../components/ProsePreviewLinks.tsx";
 import { services } from "../data/services.ts";
-import { portfolioProjects } from "../data/portfolio.ts";
+import { portfolioProjects, projectSlug } from "../data/portfolio.ts";
 import { industries } from "../data/industries.ts";
 import { FOUNDED_YEAR, TEAM_SIZE, STORY, TEAM, PROCESS } from "../data/team.ts";
 import {
@@ -15,6 +16,21 @@ import {
 } from "../data/site";
 
 const liveCount = portfolioProjects.filter((p) => p.url).length;
+
+// Client types named in the first story paragraph, each previewing a real
+// client site on hover (its existing screenshot) and linking to the case
+// study. A phrase is only linked when its project exists in the data.
+const storyLinks = (
+  [
+    ["jewellers", "Hars Jewellery"],
+    ["clinics", "Dr. Alam's Skin Clinic"],
+    ["exporters", "Deva Sea Food"],
+    ["training companies", "LearnMore Projects"],
+  ] as const
+).flatMap(([phrase, title]) => {
+  const project = portfolioProjects.find((p) => p.title === title);
+  return project ? [{ phrase, href: `/work/${projectSlug(project)}`, image: project.image }] : [];
+});
 
 const facts = [
   { k: "Company type", v: `${COMPANY_TYPE}, registered in India` },
@@ -89,7 +105,13 @@ const schema = {
         {STORY.length > 0 && (
           <section class="ab-block">
             <h2>Our story</h2>
-            {STORY.map((p) => <p class="ab-para">{p}</p>)}
+            {STORY.map((p, i) => (
+              <p class="ab-para">
+                {i === 0 && storyLinks.length > 0
+                  ? <ProsePreviewLinks client:visible text={p} links={storyLinks} />
+                  : p}
+              </p>
+            ))}
           </section>
         )}
 
