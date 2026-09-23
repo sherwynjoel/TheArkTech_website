@@ -134,11 +134,13 @@ const links = [
 
   /* Active section — a quiet, persistent highlight (not a shouty pill). */
   .nav-link.is-current { color: var(--ink); background: rgba(96, 165, 250, 0.14); }
-  #nav-mobile .nav-link.is-current { color: var(--brand-bright); }
+  #nav-mobile .nav-link.is-current { color: var(--brand-bright); background: transparent; }
 
   /* Mobile menu: a full-screen sheet behind the header bar (z-index -1 keeps
      the logo and the close button on top inside the header's own stacking context). */
-  #site-nav.nav-open { background: #000; }
+  /* No blur while open: a backdrop-filter on the header makes Chrome clip the
+     fixed sheet to the header box, so a scrolled page showed only the first link. */
+  #site-nav.nav-open { background: #000; backdrop-filter: none; -webkit-backdrop-filter: none; }
   :global(body.menu-open .call-fab) { display: none; }
   .nav-sheet {
     position: fixed;
